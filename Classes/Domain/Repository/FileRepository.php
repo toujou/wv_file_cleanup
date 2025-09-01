@@ -81,13 +81,14 @@ class FileRepository implements SingletonInterface
 
         // filter out all files in _recycler_ and _processed_ folder + check fileDenyPattern
         $files = array_filter($files, function (FileInterface $file) use ($fileDenyPattern, $pathDenyPattern) {
-            if ($file->getParentFolder()->getName() === '_recycler_' || $file instanceof ProcessedFile) {
+            // maybe $file->isMissing() would be useful?
+            if ($file instanceof ProcessedFile || $file->getParentFolder()->getName() === '_recycler_') {
                 return false;
             }
-            if (!empty($fileDenyPattern) && preg_match($fileDenyPattern, $file->getName())) {
+            if (!empty($fileDenyPattern) && preg_match($fileDenyPattern, $file->getName() ?? '')) {
                 return false;
             }
-            if (!empty($pathDenyPattern) && preg_match($pathDenyPattern, $file->getPublicUrl())) {
+            if (!empty($pathDenyPattern) && preg_match($pathDenyPattern, $file->getPublicUrl() ?? '')) {
                 return false;
             }
             return true;
